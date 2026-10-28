@@ -120,6 +120,7 @@ details.deep[open]>summary{border-bottom:1px solid var(--line)}
 section{padding:60px 0;border-top:1px solid var(--line)}
 .eyebrow{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:600;margin:0 0 8px}
 section h2{font-size:clamp(28px,4vw,38px);margin-bottom:10px}
+h2 .hl{color:var(--accent)}
 .kicker{color:var(--muted);margin:0 0 30px;font-size:17px;max-width:44em}
 h3{font-size:23px;margin:0 0 8px}
 h4{font-family:var(--serif-head);font-size:18px;color:var(--head);margin:0 0 4px;line-height:1.25}
@@ -220,7 +221,9 @@ ul.tight li{margin:5px 0}
 
 /* vision */
 .vis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
-.v{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 20px 18px}
+.vis{counter-reset:v}
+.v{position:relative;counter-increment:v;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 20px 18px}
+.v::after{content:"0" counter(v);position:absolute;top:14px;right:18px;font:700 36px/1 var(--serif-head);letter-spacing:-.02em;color:color-mix(in srgb,var(--muted) 40%,transparent)}
 .v svg{width:40px;height:40px;color:var(--head);display:block;margin-bottom:10px}
 .v b{display:block;font-family:var(--serif-head);font-size:19px;line-height:1.25;color:var(--head);margin-bottom:6px}
 .v span{font-size:15.5px;color:var(--ink);line-height:1.5;display:block}
@@ -327,7 +330,7 @@ footer{padding:34px 0 50px;border-top:1px solid var(--line);font-size:15px;color
 <section id="project">
   <div class="wrap">
     <p class="eyebrow">PhD project · 2023–2027</p>
-    <h2>Working memory, with and without consciousness</h2>
+    <h2>Working memory,<br><span class="hl">with and without consciousness</span></h2>
     <p class="kicker">My PhD studies the computational principles of consciousness through working memory: can working memory operate on information we are not aware of? I build biologically constrained network models of unconscious working memory experiments and contrast them with human findings, looking for the mechanisms that could explain them. Two projects feed this question.</p>
     <div class="trio">
       <div class="tp panel">
@@ -380,7 +383,7 @@ footer{padding:34px 0 50px;border-top:1px solid var(--line);font-size:15px;color
         <p class="authors">Castillejo &amp; Vadillo (2026). Preprint, PsyArXiv.</p>
         <p>We studied a paradigm of trainable E–I networks and identified a potential source of bias in computational experiments with them. Dale’s principle is enforced by passing the <em>weights</em> through a ReLU: one technical choice among hundreds, easily overlooked, yet with significant consequences. <strong>A weight that reaches zero can never recover</strong>, so connectivity is silently pruned, training slows and dynamics change. The absolute value avoids it.</p>
         <div class="stats">
-          <div class="stat"><b>up to 95%</b><span>of E→E connections pruned</span></div>
+          <div class="stat"><b>up to <span class="cnt" data-to="95">95</span>%</b><span>of E→E connections pruned</span></div>
           <div class="stat"><b>by task</b><span>pruning pattern set by task and biology, not by the user</span></div>
           <div class="stat"><b>|w| fixes it</b><span>no pruning, faster training</span></div>
         </div>
@@ -810,6 +813,19 @@ footer{padding:34px 0 50px;border-top:1px solid var(--line);font-size:15px;color
     var r=function(s){return s.split('').reverse().join('');},addr=r(a.dataset.u)+'@'+r(a.dataset.d);
     a.href='mailto:'+addr;if(a.dataset.show)a.textContent=addr;
   });
+
+  /* ---------- count-up stats ---------- */
+  (function(){
+    var els=[].slice.call(document.querySelectorAll('.cnt'));
+    if(reduce||!('IntersectionObserver' in window))return;
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){
+      if(!e.isIntersecting)return;io.unobserve(e.target);
+      var el=e.target,to=+el.dataset.to,t0=null;
+      function f(t){if(t0===null)t0=t;var k=Math.min(1,(t-t0)/1100);el.textContent=Math.round(to*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f);}
+      el.textContent='0';requestAnimationFrame(f);
+    });},{threshold:.6});
+    els.forEach(function(el){io.observe(el);});
+  })();
 
   /* ---------- in-depth details ---------- */
   (function(){
