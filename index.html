@@ -750,7 +750,7 @@ footer{padding:34px 0 50px;border-top:1px solid var(--line);font-size:15px;color
     function nib(s,n){var by=b64(s),o=new Uint8Array(n);for(var i=0;i<n;i++){var v=by[i>>1];o[i]=(i&1)?(v&15):(v>>4);}return o;}
     var cache={};
     function codes(task,net,wf,mat){var k=task+net+wf+mat;if(cache[k])return cache[k];var w=W[task],e=w.nets[net][wf],dims=mat==='rnn'?[100,100]:mat==='in'?[100,w.n_in]:[100,3];var c={r:dims[0],c:dims[1],v:nib(e[mat],dims[0]*dims[1]),p:e.pruned[mat]};cache[k]=c;return c;}
-    function load(task,cb){if(W[task])return cb();fetch('data/weights_'+task+'.json').then(function(r){return r.json();}).then(function(j){W[task]=j;cb();}).catch(function(){$('x-load').textContent='Could not load the data.';});}
+    var pend={};function load(task,cb){if(W[task])return cb();if(!pend[task])pend[task]=fetch('data/weights_'+task+'.json').then(function(r){return r.json();}).then(function(j){W[task]=j;});pend[task].then(cb).catch(function(){$('x-load').textContent='Could not load the data.';});}
     function rowLabels(){return[[0,40,'E fac'],[40,80,'E dep'],[80,90,'I f'],[90,100,'I d']];}
     function colLabels(mat,c){if(mat==='rnn')return rowLabels();if(mat==='out')return[[0,1,'Fix'],[1,2,'NM'],[2,3,'M']];return c>24?[[0,24,'RF 1'],[24,48,'RF 2'],[48,54,'Rule']]:[[0,24,'RF 1']];}
     function drawMat(cv,M,mat){
